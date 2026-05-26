@@ -26,29 +26,29 @@ class TwoLayerCNN:
         pool_output_size2 = conv_output_size2 // 2
 
         # 가중치 초기화
-        self.param = {}
-        self.param['W1'] = weight_init_std*np.random.randn(filter_num1, input_dim[0], filter_size, filter_size)
-        self.param['b1'] = np.zeros(filter_num1)
-        self.param['W2'] = weight_init_std*np.random.randn(filter_num2, filter_num1, filter_size, filter_size)
-        self.param['b2'] = np.zeros(filter_num2)
-        self.param['W3'] = weight_init_std*np.random.randn(pool_output_size2 * filter_num2, hidden_size)
-        self.param['b3'] = np.zeros(hidden_size)
-        self.param['W4'] = weight_init_std*np.random.randn(hidden_size, output_size)
-        self.param['b4'] = np.zeros(output_size)
+        self.params = {}
+        self.params['W1'] = weight_init_std*np.random.randn(filter_num1, input_dim[0], filter_size, filter_size)
+        self.params['b1'] = np.zeros(filter_num1)
+        self.params['W2'] = weight_init_std*np.random.randn(filter_num2, filter_num1, filter_size, filter_size)
+        self.params['b2'] = np.zeros(filter_num2)
+        self.params['W3'] = weight_init_std*np.random.randn(filter_num2 * pool_output_size2 * pool_output_size2, hidden_size)
+        self.params['b3'] = np.zeros(hidden_size)
+        self.params['W4'] = weight_init_std*np.random.randn(hidden_size, output_size)
+        self.params['b4'] = np.zeros(output_size)
                 
         # 계층 생성 아래의 구조에 맞게 생성
         # Conv1 -> Relu -> Pool -> Conv2 -> Relu -> Pool 
         # -> Hidden(Affine) -> Relu -> Hidden(Affine) -> Softmax -> output
         self.layers = OrderedDict()
-        self.layers['Conv1'] = Convolution(self.param['W1'], self.param['b1'], conv_param['stride'], conv_param['pad'])
+        self.layers['Conv1'] = Convolution(self.params['W1'], self.params['b1'], conv_param['stride'], conv_param['pad'])
         self.layers['Relu1'] = Relu()
         self.layers['Pool1'] = Pooling(pool_h=2, pool_w=2, stride=2)
-        self.layers['Conv2'] = Convolution(self.param['W2'], self.param['b2'], conv_param['stride'], conv_param['pad'])
+        self.layers['Conv2'] = Convolution(self.params['W2'], self.params['b2'], conv_param['stride'], conv_param['pad'])
         self.layers['Relu2'] = Relu()
         self.layers['Pool2'] = Pooling(pool_h=2, pool_w=2, stride=2)
-        self.layers['Affine1'] = Affine(self.param['W3'], self.param['b3'])
+        self.layers['Affine1'] = Affine(self.params['W3'], self.params['b3'])
         self.layers['Relu3'] = Relu()
-        self.layers['Affine2'] = Affine(self.param['W4'], self.param['b4'])
+        self.layers['Affine2'] = Affine(self.params['W4'], self.params['b4'])
         self.last_layer = SoftmaxWithLoss()
 
     def predict(self, x):

@@ -22,7 +22,9 @@ t_test = dataset['t_test']
 # convolution filter의 stride는 1칸씩
 # hidden_size 100, 
 # output_size 10
-network = TwoLayerCNN(...)
+network = TwoLayerCNN(input_dim=(3, 32, 32),
+                      conv_param = {'filter_nums':(10, 15), 'filter_size': 3, 'pad': 0, 'stride':1},
+                      hidden_size=100, output_size=10, weight_init_std=0.01)
 
 # optimizer Adam 사용
 optimizer = Adam() 
@@ -39,5 +41,33 @@ current_epoch = 0
 # iterations
 # 20 에폭을 학습
 # batch_size는 100으로
+epochs = 20 
+batch_size = 100 
+train_size = x_train.shape[0]
+iter_per_epoch = max(train_size / batch_size, 1)
+max_iter = int(epochs * iter_per_epoch)
+
+for i in range(max_iter):
+    batch_mask = np.random.choice(train_size, batch_size)
+    x_batch = x_train[batch_mask]
+    t_batch = t_train[batch_mask]
+    
+    # 기울기 계산
+    grads = network.backward(x_batch, t_batch)
+    
+    # 매개변수 갱신
+    optimizer.update(network.params, grads)
+    
+    loss = network.loss(x_batch, t_batch)
+    train_loss_list.append(loss)
+    
+    if i % iter_per_epoch == 0:
+        train_acc = network.accuracy(x_train, t_train)
+        test_acc = network.accuracy(x_test, t_test)
+        train_acc_list.append(train_acc)
+        test_acc_list.append(test_acc)
+        print(f"=== epoch: {current_epoch}, train acc: {train_acc:.4f}, test acc: {test_acc:.4f} ===")
+        current_epoch += 1
 
 network.save_params('trained_TLC.pkl')
+print("Saved Network Parameters!")
