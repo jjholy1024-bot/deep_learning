@@ -85,13 +85,13 @@ class TwoLayerCNN:
             dout = layer.backward(dout)
 
         grads = {}
-        grads['W1'] = self.layers['Conv1'].dw
+        grads['W1'] = self.layers['Conv1'].dW
         grads['b1'] = self.layers['Conv1'].db
-        grads['W2'] = self.layers['Conv2'].dw
+        grads['W2'] = self.layers['Conv2'].dW
         grads['b2'] = self.layers['Conv2'].db
-        grads['W3'] = self.layers['Affine1'].dw
+        grads['W3'] = self.layers['Affine1'].dW
         grads['b3'] = self.layers['Affine1'].db
-        grads['W4'] = self.layers['Affine2'].dw
+        grads['W4'] = self.layers['Affine2'].dW
         grads['b4'] = self.layers['Affine2'].db
 
         return grads
@@ -115,4 +115,6 @@ class TwoLayerCNN:
     def load_params(self, file_name="best_model.pkl"):
         """pickle 파일에서 파라미터를 불러옴"""
         with open(file_name, 'rb') as f:
-            self.params = pickle.load(f)
+            params = pickle.load(f)
+        for key, val in params.items():
+            self.params[key][:] = val[:] 
