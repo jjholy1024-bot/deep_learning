@@ -38,6 +38,11 @@ test_acc_list=[]
 current_iter = 0
 current_epoch = 0
 
+num_train = 25000
+mask = np.random.choice(x_train.shape[0], num_train, replace=False)
+x_train = x_train[mask]
+t_train = t_train[mask]
+
 # iterations
 # 20 에폭을 학습
 # batch_size는 100으로
@@ -51,23 +56,21 @@ for i in range(max_iter):
     batch_mask = np.random.choice(train_size, batch_size)
     x_batch = x_train[batch_mask]
     t_batch = t_train[batch_mask]
-    
-    # 기울기 계산
-    grads = network.backward(x_batch, t_batch)
-    
-    # 매개변수 갱신
-    optimizer.update(network.params, grads)
-    
+
     loss = network.loss(x_batch, t_batch)
     train_loss_list.append(loss)
+
+    grads = network.backward(x_batch, t_batch)
+    optimizer.update(network.params, grads)
     
-    if i % iter_per_epoch == 0:
+    if current_iter % iter_per_epoch == 0:
+        current_epoch += 1
+
         train_acc = network.accuracy(x_train, t_train)
         test_acc = network.accuracy(x_test, t_test)
         train_acc_list.append(train_acc)
         test_acc_list.append(test_acc)
-        print(f"=== epoch: {current_epoch}, train acc: {train_acc:.4f}, test acc: {test_acc:.4f} ===")
-        current_epoch += 1
+        print(f"===epoch:{current_epoch}, train_acc:{train_acc}, test_acc:{test_acc}, loss:{loss}===")
+    current_iter += 1
 
 network.save_params('trained_TLC.pkl')
-print("Saved Network Parameters!")
